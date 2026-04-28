@@ -6,31 +6,50 @@
 # Dependencies (NEVER commit these)
 # ────────────────────────────────────────
 node_modules/
+apps/web/node_modules/
+apps/api/node_modules/
+# Legacy paths (pre-Turborepo)
 backend/node_modules/
-backend/.prisma/
-backend/dist/          # compiled TypeScript output
+
+# ────────────────────────────────────────
+# Build outputs
+# ────────────────────────────────────────
+apps/web/build/
+apps/api/dist/
+# Legacy
+/build
+backend/dist/
+
+# ────────────────────────────────────────
+# Turborepo cache
+# ────────────────────────────────────────
+.turbo/
 
 # ────────────────────────────────────────
 # Environment / Secrets (NEVER commit)
 # ────────────────────────────────────────
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+apps/web/.env
+apps/web/.env.local
+apps/web/.env.*.local
+apps/api/.env
+apps/api/.env.local
+# Legacy
 backend/.env
 backend/.env.local
 
 # ────────────────────────────────────────
-# Build outputs
-# ────────────────────────────────────────
-/build                 # CRA production build
-backend/dist/          # TypeScript compiled output
-
-# ────────────────────────────────────────
 # Uploads (runtime data, not code)
 # ────────────────────────────────────────
+apps/api/uploads/
 backend/uploads/
+
+# ────────────────────────────────────────
+# Prisma generated client
+# ────────────────────────────────────────
+apps/api/node_modules/.prisma/
 
 # ────────────────────────────────────────
 # Logs
@@ -53,10 +72,12 @@ Thumbs.db
 # ────────────────────────────────────────
 # Testing
 # ────────────────────────────────────────
-/coverage
+coverage/
+apps/web/coverage/
+apps/api/coverage/
 
 # ────────────────────────────────────────
-# Misc CRA / tooling
+# Misc
 # ────────────────────────────────────────
 /.pnp
 .pnp.js

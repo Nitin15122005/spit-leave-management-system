@@ -1,20 +1,39 @@
-# Frontend .dockerignore
-# Keeps the build context lean — only src/, public/, package*.json
-# and docker/ config are needed for the React build stage.
+# Root .dockerignore — for the frontend (Vite) image build
+# Only apps/web/, docker/frontend/, and the workspace manifests
+# are needed. Everything else stays out of the build context.
 
-node_modules
-build
+# Git
 .git
 .gitignore
+
+# Env files — baked values come via build-args
 .env
 .env.*
-*.md
-backend
-docker/nginx
+apps/web/.env
+apps/web/.env.*
 
-# Test & tooling artefacts
+# Don't send backend into the frontend build context
+apps/api
+backend
+
+# node_modules — installed fresh inside the container
+node_modules
+apps/web/node_modules
+
+# Build artefacts
+apps/web/build
+.turbo
+
+# Testing / tooling
 coverage
-.DS_Store
+*.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs / infra files not needed for the React build
+README.md
+docker/nginx

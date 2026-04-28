@@ -42,7 +42,7 @@ services:
   # ──────────────────────────────────────────
   api:
     build:
-      context:    ./backend
+      context:    ./apps/api
       dockerfile: Dockerfile
     container_name: leave_mgmt_api
     restart: unless-stopped

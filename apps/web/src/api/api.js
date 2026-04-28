@@ -4,13 +4,13 @@
  * ============================================
  *
  * All functions call the real Express/Prisma backend.
- * Base URL is read from REACT_APP_API_URL (.env).
+ * Base URL is read from VITE_API_URL (.env).
  *
  * WORKFLOW STATUS:
  * pending_teacher → pending_hod → pending_dean → approved → completed
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 // ============================================
 // HELPER FUNCTION

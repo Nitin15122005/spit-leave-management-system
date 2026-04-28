@@ -22,6 +22,15 @@ async function main() {
       email: 'nitin.sharma@spit.ac.in',
     },
     {
+      uid: '2023800119',
+      name: 'Anuj Singh',
+      role: Role.student,
+      password: '2023800119',
+      class: 'TE',
+      mobile: '2023800119',
+      email: 'anuj.singh@spit.ac.in',
+    },
+    {
       uid: 'TEACHER001',
       name: 'Prof. Rajesh Kumar',
       role: Role.teacher,
@@ -65,19 +74,39 @@ async function main() {
   }
 
   // ============================================
-  // SEED SUBJECTS
+  // SEED SUBJECTS  (must match StudentDashboard.js subjectsBySemester)
   // ============================================
   const subjects = [
-    { code: 'CS321', name: 'Natural Language Processing' },
-    { code: 'CS308', name: 'DevOps Lab' },
-    { code: 'CS307', name: 'Machine Learning' },
+    // Semester 1
+    { code: 'CS101', name: 'Programming Fundamentals' },
+    // Semester 2
+    { code: 'CS201', name: 'Data Structures' },
+    // Semester 3
+    { code: 'CS301', name: 'Database Systems' },
+    // Semester 4
+    { code: 'CS401', name: 'Software Engineering' },
+    // Semester 5
     { code: 'CS331', name: 'Business Analytics with Python' },
+    { code: 'CS307', name: 'Machine Learning' },
+    { code: 'CS306', name: 'Human Machine Interaction' },
+    { code: 'CS332', name: 'Big Data Analytics' },
+    { code: 'CE312', name: 'Deep Learning' },
+    { code: 'CS321', name: 'Natural Language Processing' },
+    // Semester 6
+    { code: 'CS601', name: 'Artificial Intelligence' },
+    // Semester 7
+    { code: 'CS701', name: 'Cyber Security' },
+    // Semester 8
+    { code: 'CS801', name: 'Project Work' },
+    // Legacy codes still referenced in seeded leave application
+    { code: 'CS308', name: 'DevOps Lab' },
   ];
 
   for (const s of subjects) {
     await prisma.subject.upsert({ where: { code: s.code }, update: {}, create: s });
     console.log(`  ✓ Subject: ${s.code} ${s.name}`);
   }
+
 
   // ============================================
   // SEED DEMO LEAVE APPLICATION

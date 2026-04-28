@@ -25,7 +25,7 @@ COPY --from=builder /app/dist ./dist
 
 RUN mkdir -p uploads
 
-EXPOSE 5000
+EXPOSE 5001
 
 # Run migrations then start
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]

@@ -1,0 +1,14 @@
+# Backend .dockerignore
+# Keeps the build context lean — only source files,
+# prisma schema, and package files are needed.
+
+node_modules
+dist
+.git
+.env
+.env.*
+*.md
+uploads
+docker-compose.yml
+.DS_Store
+npm-debug.log*

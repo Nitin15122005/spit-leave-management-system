@@ -4,16 +4,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Card from '../components/common/Card';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import StatCard from '../components/common/StatCard';
 import { getStudentLeaves } from '../api/api';
 
 const StudentApplications = () => {
-    const navigate = useNavigate();
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -43,13 +40,14 @@ const StudentApplications = () => {
 
     const getStatusConfig = (status) => {
         const configs = {
-            'pending_faculty': { label: 'Pending Faculty', color: '#f59e0b', bg: '#fffbeb', icon: '⏳', step: 1 },
-            'pending_hod': { label: 'Pending HOD', color: '#d97706', bg: '#fffbeb', icon: '📋', step: 2 },
-            'pending_dean': { label: 'Pending Dean', color: '#dc2626', bg: '#fef2f2', icon: '🎓', step: 3 },
-            'approved': { label: 'Approved', color: '#10b981', bg: '#ecfdf5', icon: '✅', step: 4 },
-            'rejected': { label: 'Rejected', color: '#ef4444', bg: '#fef2f2', icon: '❌', step: 0 }
+            'pending_teacher': { label: 'Pending Teacher', color: '#f59e0b', bg: '#fffbeb', icon: '⏳', step: 1 },
+            'pending_hod':     { label: 'Pending HOD',     color: '#d97706', bg: '#fffbeb', icon: '📋', step: 2 },
+            'pending_dean':    { label: 'Pending Dean',    color: '#dc2626', bg: '#fef2f2', icon: '🎓', step: 3 },
+            'approved':        { label: 'Approved',        color: '#10b981', bg: '#ecfdf5', icon: '✅', step: 4 },
+            'rejected':        { label: 'Rejected',        color: '#ef4444', bg: '#fef2f2', icon: '❌', step: 0 },
+            'completed':       { label: 'Completed',       color: '#6366f1', bg: '#eef2ff', icon: '🎉', step: 5 },
         };
-        return configs[status] || { label: 'Pending', color: '#6b7280', bg: '#f3f4f6', icon: '📝', step: 1 };
+        return configs[status] || { label: status || 'Pending', color: '#6b7280', bg: '#f3f4f6', icon: '📝', step: 1 };
     };
 
     const stats = {
@@ -479,9 +477,34 @@ const StudentApplications = () => {
                                 <div style={styles.detailSectionTitle}>Application Status</div>
                                 <div style={styles.approvalTimeline}>
                                     {[
-                                        { key: 'faculty', label: 'Faculty Approval', status: selectedLeave.faculty_comment ? 'completed' : (selectedLeave.status === 'pending_faculty' ? 'active' : 'pending') },
-                                        { key: 'hod', label: 'HOD Approval', status: selectedLeave.hod_comment ? 'completed' : (selectedLeave.status === 'pending_hod' ? 'active' : 'pending') },
-                                        { key: 'dean', label: 'Dean Approval', status: selectedLeave.dean_comment ? 'completed' : (selectedLeave.status === 'pending_dean' ? 'active' : 'pending') },
+                                        {
+                                            key: 'teacher',
+                                            label: 'Teacher Approval',
+                                            status: selectedLeave.teacher_comment
+                                                ? 'completed'
+                                                : (selectedLeave.status === 'pending_teacher' ? 'active' : 'pending'),
+                                        },
+                                        {
+                                            key: 'hod',
+                                            label: 'HOD Approval',
+                                            status: selectedLeave.hod_comment
+                                                ? 'completed'
+                                                : (selectedLeave.status === 'pending_hod' ? 'active' : 'pending'),
+                                        },
+                                        {
+                                            key: 'dean',
+                                            label: 'Dean Approval',
+                                            status: selectedLeave.dean_comment
+                                                ? 'completed'
+                                                : (selectedLeave.status === 'pending_dean' ? 'active' : 'pending'),
+                                        },
+                                        {
+                                            key: 'coordinator',
+                                            label: 'Attendance Marked',
+                                            status: selectedLeave.attendance_marked
+                                                ? 'completed'
+                                                : (selectedLeave.status === 'approved' ? 'active' : 'pending'),
+                                        },
                                     ].map((step, idx) => (
                                         <div key={idx} style={styles.timelineStep}>
                                             <div style={styles.timelineIcon(
@@ -492,10 +515,10 @@ const StudentApplications = () => {
                                             </div>
                                             <div style={styles.timelineContent}>
                                                 <div style={styles.timelineTitle}>{step.label}</div>
-                                                {step.key === 'faculty' && selectedLeave.faculty_comment && (
+                                                {step.key === 'teacher' && selectedLeave.teacher_comment && (
                                                     <>
-                                                        <div style={styles.timelineComment}>{selectedLeave.faculty_comment}</div>
-                                                        <div style={styles.timelineDate}>Reviewed by Faculty</div>
+                                                        <div style={styles.timelineComment}>{selectedLeave.teacher_comment}</div>
+                                                        <div style={styles.timelineDate}>Reviewed by Teacher</div>
                                                     </>
                                                 )}
                                                 {step.key === 'hod' && selectedLeave.hod_comment && (
@@ -508,6 +531,12 @@ const StudentApplications = () => {
                                                     <>
                                                         <div style={styles.timelineComment}>{selectedLeave.dean_comment}</div>
                                                         <div style={styles.timelineDate}>Reviewed by Dean</div>
+                                                    </>
+                                                )}
+                                                {step.key === 'coordinator' && selectedLeave.coordinator_comment && (
+                                                    <>
+                                                        <div style={styles.timelineComment}>{selectedLeave.coordinator_comment}</div>
+                                                        <div style={styles.timelineDate}>Attendance marked by Coordinator</div>
                                                     </>
                                                 )}
                                             </div>
@@ -639,14 +668,6 @@ const StudentApplications = () => {
                                 <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
                                     Close
                                 </Button>
-                                {selectedLeave.status?.includes('pending') && (
-                                    <Button variant="outline" onClick={() => {
-                                        setShowDetailModal(false);
-                                        // Navigate to edit or track page if needed
-                                    }}>
-                                        Track Application
-                                    </Button>
-                                )}
                             </div>
                         </div>
                     </div>

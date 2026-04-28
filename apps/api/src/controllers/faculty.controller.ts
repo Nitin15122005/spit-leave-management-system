@@ -141,7 +141,7 @@ export const getApprovalHistory = async (req: Request, res: Response): Promise<v
     ? [LeaveStatus.pending_teacher]
     : role === Role.hod
     ? [LeaveStatus.pending_teacher, LeaveStatus.pending_hod]
-    : [];
+    : [LeaveStatus.pending_teacher, LeaveStatus.pending_hod]; // Dean: only show dean-level+ leaves
 
   const history = await prisma.leaveApplication.findMany({
     where: { status: { notIn: excludeStatuses } },

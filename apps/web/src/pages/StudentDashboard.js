@@ -22,9 +22,9 @@ const StudentDashboard = () => {
 
     const [studentInfo, setStudentInfo] = useState({
         name: localStorage.getItem('userName') || '',
-        class: '',
-        uid: '',
-        mobile: ''
+        class: localStorage.getItem('userClass') || '',
+        uid: localStorage.getItem('userUid') || '',
+        mobile: localStorage.getItem('userMobile') || ''
     });
 
     const subjectsBySemester = {
@@ -172,6 +172,13 @@ const StudentDashboard = () => {
             return;
         }
 
+        if (!formData.event_duration_from || !formData.event_duration_to ||
+            !formData.leave_dates_from || !formData.leave_dates_to) {
+            setError('Please fill in all event and leave date fields');
+            setSubmitting(false);
+            return;
+        }
+
         if (selectedSubjects.length === 0) {
             setError('Please add at least one subject');
             setSubmitting(false);
@@ -236,13 +243,14 @@ const StudentDashboard = () => {
 
     const getStatusConfig = (status) => {
         const configs = {
-            'pending_faculty': { label: 'Pending Faculty', color: '#f59e0b', bg: '#fffbeb' },
-            'pending_hod': { label: 'Pending HOD', color: '#d97706', bg: '#fffbeb' },
-            'pending_dean': { label: 'Pending Dean', color: '#dc2626', bg: '#fef2f2' },
-            'approved': { label: 'Approved', color: '#10b981', bg: '#ecfdf5' },
-            'rejected': { label: 'Rejected', color: '#ef4444', bg: '#fef2f2' }
+            'pending_teacher': { label: 'Pending Teacher', color: '#f59e0b', bg: '#fffbeb' },
+            'pending_hod':     { label: 'Pending HOD',     color: '#d97706', bg: '#fffbeb' },
+            'pending_dean':    { label: 'Pending Dean',    color: '#dc2626', bg: '#fef2f2' },
+            'approved':        { label: 'Approved',        color: '#10b981', bg: '#ecfdf5' },
+            'rejected':        { label: 'Rejected',        color: '#ef4444', bg: '#fef2f2' },
+            'completed':       { label: 'Completed',       color: '#6366f1', bg: '#eef2ff' },
         };
-        return configs[status] || { label: 'Pending', color: '#6b7280', bg: '#f3f4f6' };
+        return configs[status] || { label: status || 'Pending', color: '#6b7280', bg: '#f3f4f6' };
     };
 
     const stats = {

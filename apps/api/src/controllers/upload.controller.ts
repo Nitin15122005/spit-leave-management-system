@@ -37,7 +37,8 @@ export const uploadProof = (req: Request, res: Response): void => {
     return;
   }
 
-  const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  const baseUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+  const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
 
   res.json({
     success: true,

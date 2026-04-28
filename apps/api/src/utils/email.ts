@@ -1,14 +1,26 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const isEmailConfigured =
+  !!process.env.SMTP_USER?.trim() && !!process.env.SMTP_PASS?.trim();
+
+// Lazy — only created when email is actually configured & needed
+const getTransporter = (() => {
+  let _transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+  return () => {
+    if (!_transporter) {
+      _transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+    }
+    return _transporter;
+  };
+})();
 
 export interface EmailOptions {
   to: string;
@@ -17,16 +29,27 @@ export interface EmailOptions {
 }
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
-  if (!process.env.SMTP_USER) {
-    console.log('[EMAIL SKIPPED - SMTP not configured]', options.subject, '→', options.to);
+  if (!isEmailConfigured) {
+    console.log(`[EMAIL SKIPPED] SMTP not configured — "${options.subject}" → ${options.to}`);
     return;
   }
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM || 'Leave System <noreply@spit.ac.in>',
-    ...options,
-  });
+  try {
+    await getTransporter().sendMail({
+      from: process.env.EMAIL_FROM || 'Leave System <noreply@spit.ac.in>',
+      ...options,
+    });
+    console.log(`[EMAIL SENT] ✓ "${options.subject}" → ${options.to}`);
+  } catch (err: any) {
+    console.error(`[EMAIL FAILED] "${options.subject}" → ${options.to}`);
+    console.error(`  Code: ${err.code} | Response: ${err.response || err.message}`);
+    if (err.code === 'EAUTH') {
+      console.error('  ⚠️  Gmail rejected the credentials. Make sure SMTP_PASS is a 16-char App Password,');
+      console.error('       NOT your regular Gmail password. Generate one at: myaccount.google.com/apppasswords');
+    }
+  }
 };
+
 
 // ============================================
 // EMAIL TEMPLATES

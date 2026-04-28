@@ -67,13 +67,15 @@ const FacultyDashboard = () => {
             }
 
             if (response.success) {
+                setError('');
+                setComment('');
                 setSuccess(`Application ${actionType === 'approve' ? 'approved' : 'rejected'} successfully`);
                 setSelectedLeave(null);
                 loadPendingLeaves();
                 setTimeout(() => setSuccess(''), 3000);
             }
         } catch (err) {
-            setError('Action failed');
+            setError('Action failed. Please try again.');
         }
     };
 

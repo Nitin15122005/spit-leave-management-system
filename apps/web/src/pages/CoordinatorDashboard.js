@@ -21,6 +21,7 @@ const CoordinatorDashboard = () => {
     const [selectedLeave, setSelectedLeave] = useState(null);
     const [comment, setComment] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         loadApprovedLeaves();
@@ -50,19 +51,20 @@ const CoordinatorDashboard = () => {
             return;
         }
 
-        setLoading(true);
+        setSubmitting(true);
         try {
             const response = await markAttendanceAndAcknowledge(selectedLeave.id, comment);
             if (response.success) {
+                setError('');
                 setSuccess(response.message);
                 setShowModal(false);
                 loadApprovedLeaves();
-                setTimeout(() => setSuccess(''), 3000);
+                setTimeout(() => setSuccess(''), 4000);
             }
         } catch (err) {
-            setError('Failed to mark attendance');
+            setError('Failed to mark attendance. Please try again.');
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
@@ -216,7 +218,13 @@ const CoordinatorDashboard = () => {
                         />
                         <div style={styles.modalActions}>
                             <button style={styles.btnCancel} onClick={() => setShowModal(false)}>Cancel</button>
-                            <button style={styles.btnSuccess} onClick={submitAttendance}>Confirm & Mark Attendance</button>
+                            <button
+                                style={{ ...styles.btnSuccess, opacity: submitting ? 0.7 : 1 }}
+                                onClick={submitAttendance}
+                                disabled={submitting}
+                            >
+                                {submitting ? 'Processing...' : 'Confirm & Mark Attendance'}
+                            </button>
                         </div>
                     </div>
                 </div>

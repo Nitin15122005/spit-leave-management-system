@@ -21,6 +21,7 @@ const FacultyDashboard = () => {
     const [selectedLeave, setSelectedLeave] = useState(null);
     const [comment, setComment] = useState('');
     const [actionType, setActionType] = useState('');
+    const [viewDetailsLeave, setViewDetailsLeave] = useState(null);
 
     const userRole = localStorage.getItem('userRole');
 
@@ -125,6 +126,7 @@ const FacultyDashboard = () => {
         td: { padding: '16px', fontSize: '14px', color: '#374151', borderBottom: '1px solid #F0F0F0' },
         btnApprove: { background: '#059669', color: '#FFFFFF', border: 'none', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer', marginRight: '8px' },
         btnReject: { background: '#FFFFFF', color: '#DC2626', border: '1px solid #FEE2E2', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer' },
+        btnView: { background: '#3B82F6', color: '#FFFFFF', border: 'none', padding: '6px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer', marginRight: '8px' },
         modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 },
         modal: { background: '#FFFFFF', borderRadius: '16px', width: '480px', maxWidth: '90%', padding: '24px' },
         modalTitle: { fontSize: '18px', fontWeight: '600', color: '#111827', marginBottom: '16px' },
@@ -136,6 +138,11 @@ const FacultyDashboard = () => {
         alertSuccess: { background: '#ECFDF5', color: '#059669', border: '1px solid #D1FAE5' },
         emptyState: { textAlign: 'center', padding: '60px 20px', color: '#9CA3AF' },
         proofLink: { color: '#3B82F6', textDecoration: 'none', fontSize: '13px' },
+        detailRow: { display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #E5E7EB', fontSize: '14px' },
+        detailLabel: { fontWeight: '600', color: '#6B7280', minWidth: '200px' },
+        detailValue: { color: '#111827', flex: 1 },
+        detailSection: { marginBottom: '20px' },
+        detailSectionTitle: { fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '12px', paddingTop: '8px', borderTop: '1px solid #F0F0F0' },
     };
 
     const stats = {
@@ -221,6 +228,7 @@ const FacultyDashboard = () => {
                                                 )}
                                             </td>
                                             <td style={styles.td}>
+                                                <button style={styles.btnView} onClick={() => setViewDetailsLeave(leave)}>View</button>
                                                 <button style={styles.btnApprove} onClick={() => handleApprove(leave)}>Approve</button>
                                                 <button style={styles.btnReject} onClick={() => handleReject(leave)}>Reject</button>
                                             </td>
@@ -232,6 +240,140 @@ const FacultyDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {viewDetailsLeave && (
+                <div style={styles.modalOverlay} onClick={() => setViewDetailsLeave(null)}>
+                    <div style={{ ...styles.modal, width: '600px', maxHeight: '80vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+                        <div style={styles.modalTitle}>Application Details</div>
+                        
+                        {/* Student Information */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Student Information</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Name:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.student_name}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>UID:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.student_uid}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Class:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.student_class}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Email:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.student_email || 'N/A'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Phone:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.student_phone || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        {/* Leave Information */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Leave Information</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>From Date:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.leave_dates_from}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>To Date:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.leave_dates_to}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Time:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.time || viewDetailsLeave.leave_time || 'N/A'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Leave Type:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.leave_type || 'N/A'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Reason:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.reason || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        {/* Event Information */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Event Information</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Event Name:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.event_name}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Organized By:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.organized_by || 'N/A'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Location:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.location || 'N/A'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Description:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.description || 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        {/* Subject Information */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Subject Information</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Subject Code:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.subjects?.[0]?.code || viewDetailsLeave.course_code}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Subject Name:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.subjects?.[0]?.name || viewDetailsLeave.subject_name}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Theory Classes:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.total_theory || 0}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Lab Classes:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.total_lab || 0}</span>
+                            </div>
+                        </div>
+
+                        {/* Proof */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Proof Document</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Status:</span>
+                                <span style={styles.detailValue}>
+                                    {viewDetailsLeave.proof_link ? (
+                                        <a href={viewDetailsLeave.proof_link} target="_blank" rel="noopener noreferrer" style={styles.proofLink}>
+                                            📎 View Proof
+                                        </a>
+                                    ) : (
+                                        'No proof uploaded'
+                                    )}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Application Status */}
+                        <div style={styles.detailSection}>
+                            <div style={styles.detailSectionTitle}>Application Status</div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Status:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.status || 'Pending'}</span>
+                            </div>
+                            <div style={styles.detailRow}>
+                                <span style={styles.detailLabel}>Submitted Date:</span>
+                                <span style={styles.detailValue}>{viewDetailsLeave.created_at ? new Date(viewDetailsLeave.created_at).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                        </div>
+
+                        <div style={styles.modalActions}>
+                            <button style={styles.btnReject} onClick={() => setViewDetailsLeave(null)}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {selectedLeave && (
                 <div style={styles.modalOverlay} onClick={() => setSelectedLeave(null)}>

@@ -5,7 +5,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY prisma ./prisma/
 
-RUN npm ci
+RUN npm install
 RUN npx prisma generate
 
 COPY src ./src
@@ -18,7 +18,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 RUN npx prisma generate
 
 COPY --from=builder /app/dist ./dist
@@ -27,5 +27,4 @@ RUN mkdir -p uploads
 
 EXPOSE 5001
 
-# Run migrations then start
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]

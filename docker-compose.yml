@@ -1,18 +1,5 @@
 # ============================================
 # SPIT Leave Management System — Full Stack
-#
-# Architecture:
-#   Browser → :80 (proxy) → /api/* → api:5001
-#                         → /*     → frontend:80
-#
-# Usage:
-#   docker compose up --build -d        # start everything
-#   docker compose logs -f              # tail all logs
-#   docker compose down -v              # stop + remove volumes
-#
-# Secrets: override JWT_SECRET and DATABASE_URL
-#          via a .env file at project root or
-#          environment variables before running.
 # ============================================
 
 services:
@@ -25,77 +12,66 @@ services:
     container_name: leave_mgmt_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER:     postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB:       leave_management
+      POSTGRES_DB: leave_management
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:     ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
-      timeout:  5s
-      retries:  5
-    # Not exposed to the host — only reachable by other services
+      timeout: 5s
+      retries: 5
 
   # ──────────────────────────────────────────
   # Express / Prisma API
   # ──────────────────────────────────────────
   api:
     build:
-      context:    ./apps/api
+      context: ./apps/api
       dockerfile: Dockerfile
     container_name: leave_mgmt_api
     restart: unless-stopped
     environment:
-      NODE_ENV:      production
-      PORT:          5001
-      DATABASE_URL:  postgresql://postgres:password@db:5432/leave_management?schema=public
-      JWT_SECRET:    change_this_to_a_long_random_secret_before_deploying
+      NODE_ENV: production
+      PORT: 5001
+      DATABASE_URL: postgresql://postgres:password@db:5432/leave_management?schema=public
+      JWT_SECRET: change_this_to_a_long_random_secret_before_deploying
       JWT_EXPIRES_IN: 7d
-      FRONTEND_URL:  http://localhost   # proxy sits on port 80
-      UPLOAD_DIR:    uploads
+      FRONTEND_URL: http://localhost
+      UPLOAD_DIR: uploads
       MAX_FILE_SIZE_MB: 10
-      # Optional — set these to enable email notifications
-      # SMTP_HOST:  smtp.gmail.com
-      # SMTP_PORT:  587
-      # SMTP_USER:  you@gmail.com
-      # SMTP_PASS:  your_app_password
-      # EMAIL_FROM: "Leave Management System <noreply@spit.ac.in>"
     volumes:
       - uploads_data:/app/uploads
     depends_on:
       db:
         condition: service_healthy
-    # Not exposed to the host — only reachable via the proxy
 
   # ──────────────────────────────────────────
-  # React Frontend (nginx, static build)
+  # React Frontend
   # ──────────────────────────────────────────
   frontend:
     build:
-      context:    .
+      context: .
       dockerfile: Dockerfile
       args:
-        # /api is same-origin — the proxy routes it to the API container.
-        # Change this to an absolute URL only if you're not using the proxy.
         REACT_APP_API_URL: /api
     container_name: leave_mgmt_frontend
     restart: unless-stopped
     depends_on:
       - api
-    # Not exposed to the host — only reachable via the proxy
 
   # ──────────────────────────────────────────
-  # Nginx Reverse Proxy (single entry point)
+  # Nginx Reverse Proxy (FIXED)
   # ──────────────────────────────────────────
   proxy:
-    image: nginx:alpine
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
     container_name: leave_mgmt_proxy
     restart: unless-stopped
     ports:
-      - '80:80'
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - "80:80"
     depends_on:
       - api
       - frontend

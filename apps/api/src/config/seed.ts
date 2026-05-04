@@ -19,7 +19,7 @@ async function main() {
       password: '2023800110',
       class: 'TE',
       mobile: '9876543210',
-      email: 'nitin.sharma@spit.ac.in',
+      email: 'nitin.sharma23@spit.ac.in',
     },
     {
       uid: '2023800119',
@@ -28,7 +28,7 @@ async function main() {
       password: '2023800119',
       class: 'TE',
       mobile: '2023800119',
-      email: 'anujsingh3672@gmail.com',
+      email: 'anuj.singh23@spit.ac.in',
     },
     {
       uid: 'TEACHER001',
